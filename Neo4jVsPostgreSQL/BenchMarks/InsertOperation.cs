@@ -7,6 +7,7 @@ namespace Neo4jVsPostgreSQL.BenchMarks
     [RPlotExporter]
     public class InsertOperation
     {
+        // ReSharper disable once UnassignedField.Global
         [Params(DbNeo4J, "PostgreSQL")] public string Db;
 
         private const int InsertRecords = 1000;

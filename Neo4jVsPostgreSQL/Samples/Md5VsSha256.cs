@@ -9,32 +9,33 @@ namespace Neo4jVsPostgreSQL.Samples
     [RPlotExporter]
     public class Md5VsSha256
     {
+        // ReSharper disable once UnassignedField.Global
         [Params(1000, 10000)] public int N;
-        private byte[] data;
-        private byte[] data2;
+        private byte[] _data;
+        private byte[] _data2;
 
-        private readonly SHA256 sha256 = SHA256.Create();
-        private readonly MD5 md5 = MD5.Create();
+        private readonly SHA256 _sha256 = SHA256.Create();
+        private readonly MD5 _md5 = MD5.Create();
 
         [GlobalSetup]
         public void Setup()
         {
-            data = new byte[N];
-            data2 = new byte[N / 2];
+            _data = new byte[N];
+            _data2 = new byte[N / 2];
 
             var rad = new Random(42);
 
-            rad.NextBytes(data);
-            rad.NextBytes(data2);
+            rad.NextBytes(_data);
+            rad.NextBytes(_data2);
         }
 
         [Benchmark]
-        public byte[] Sha256() => sha256.ComputeHash(data);
+        public byte[] Sha256() => _sha256.ComputeHash(_data);
 
         [Benchmark]
-        public byte[] Md5() => md5.ComputeHash(data);
+        public byte[] Md5() => _md5.ComputeHash(_data);
 
         [Benchmark]
-        public byte[] Md5_Half() => md5.ComputeHash(data2);
+        public byte[] Md5_Half() => _md5.ComputeHash(_data2);
     }
 }
