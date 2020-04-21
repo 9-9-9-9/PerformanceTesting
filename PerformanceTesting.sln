@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo4jVsPostgreSQL", "Neo4jVsPostgreSQL\Neo4jVsPostgreSQL.csproj", "{080EB19D-93AA-4110-A044-7F97F31159C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLib", "SharedLib\SharedLib.csproj", "{BA42A1EB-AB52-4581-B320-579296A80E6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{080EB19D-93AA-4110-A044-7F97F31159C4}.Release|x64.Build.0 = Release|Any CPU
 		{080EB19D-93AA-4110-A044-7F97F31159C4}.Release|x86.ActiveCfg = Release|Any CPU
 		{080EB19D-93AA-4110-A044-7F97F31159C4}.Release|x86.Build.0 = Release|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Debug|x64.Build.0 = Debug|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Debug|x86.Build.0 = Debug|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|x64.ActiveCfg = Release|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|x64.Build.0 = Release|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|x86.ActiveCfg = Release|Any CPU
+		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

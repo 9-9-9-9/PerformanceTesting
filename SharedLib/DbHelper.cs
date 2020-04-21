@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Neo4j.Driver;
 using Npgsql;
 
-namespace Neo4jVsPostgreSQL
+namespace SharedLib
 {
     public static class DbHelper
     {
@@ -29,14 +29,14 @@ namespace Neo4jVsPostgreSQL
     {
         public static async Task ExecuteAsync(this NpgsqlConnection connection, string command)
         {
-            await using var cmd = new NpgsqlCommand(command, connection);
+            using var cmd = new NpgsqlCommand(command, connection);
             await cmd.ExecuteNonQueryAsync();
         }
 
         public static async Task<T> ReadAsync<T>(this NpgsqlConnection connection, string command,
             Func<NpgsqlDataReader, T> resultExtractor)
         {
-            await using var cmd = new NpgsqlCommand(command, connection);
+            using var cmd = new NpgsqlCommand(command, connection);
 
             var dataReader = await cmd.ExecuteReaderAsync();
             if (!dataReader.Read())

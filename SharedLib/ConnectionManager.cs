@@ -1,6 +1,6 @@
 using Neo4j.Driver;
 
-namespace Neo4jVsPostgreSQL
+namespace SharedLib
 {
     public static class ConnectionManager
     {

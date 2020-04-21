@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Neo4j.Driver;
+using SharedLib;
 
 namespace Neo4jVsPostgreSQL.BenchMarks
 {
