@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo4jVsPostgreSQL", "Neo4jV
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLib", "SharedLib\SharedLib.csproj", "{BA42A1EB-AB52-4581-B320-579296A80E6E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StopWatcher", "StopWatcher\StopWatcher.csproj", "{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|x64.Build.0 = Release|Any CPU
 		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|x86.ActiveCfg = Release|Any CPU
 		{BA42A1EB-AB52-4581-B320-579296A80E6E}.Release|x86.Build.0 = Release|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Debug|x64.Build.0 = Debug|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Debug|x86.Build.0 = Debug|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Release|x64.ActiveCfg = Release|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Release|x64.Build.0 = Release|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Release|x86.ActiveCfg = Release|Any CPU
+		{A1CC2693-E5FF-4B56-9D3E-76EE31A51419}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
