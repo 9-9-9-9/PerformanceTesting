@@ -16,7 +16,7 @@ namespace StopWatcher.TestCases
         private const string Label = "NBigRel3";
         private const string Rel = "HAS_REL2";
 
-        private const int MaxNoOfRel = 400_000;
+        private const int MaxNoOfRel = 500_000;
         private const int BatchSize = 1_000;
         private const int PoolSize = 3;
 
@@ -112,6 +112,12 @@ namespace StopWatcher.TestCases
                         throw new NoDataException();
                     });
 
+                if (noOfRel < MaxNoOfRel)
+                {
+                    Console.WriteLine($"Un-expected number of rel had been found. Expected {MaxNoOfRel} but found {noOfRel}, offset is {MaxNoOfRel - noOfRel}");
+                    Environment.Exit(1);
+                }
+
                 Console.WriteLine($"> {noOfRel} existing relation, max no = {relMaxNo}");
 
                 var stopWatch = new Stopwatch();
@@ -131,7 +137,7 @@ namespace StopWatcher.TestCases
                     best = Math.Min(best, stopWatch.ElapsedMilliseconds);
                 } while (--tries > 0);
                 
-                Console.WriteLine($"> Best record is {best} ms");
+                Console.WriteLine($"> Best record is {best} ms for {noOfRel} relations");
             }
         }
 
