@@ -22,9 +22,17 @@ namespace StopWatcher.TestCases
             1_000,
             10_000, 
             100_000, 
+            200_000, 
+            300_000, 
+            400_000, 
+            500_000, 
+            600_000, 
+            700_000, 
+            800_000, 
+            900_000, 
             1_000_000
         };
-        private const int BatchOfCreatingRelationships = 100_000;
+        private const int BatchOfCreatingRelationships = 10_000;
         private const byte PoolSize = 3;
 
         public override async Task RunAsync()
@@ -33,7 +41,7 @@ namespace StopWatcher.TestCases
             {
                 Console.WriteLine($"> Using node label :{_nodeLabel}");
                 Console.WriteLine("> Preparing data");
-                await PrepareDataAsync();
+                await PrepareAsync();
                 Console.WriteLine("> Finished in data preparation");
                 Console.WriteLine($"> Before {nameof(DoWorkAsync)}");
                 await DoWorkAsync();
@@ -45,9 +53,9 @@ namespace StopWatcher.TestCases
             }
         }
 
-        private async Task PrepareDataAsync()
+        protected override async Task PrepareAsync()
         {
-            var asyncSession = DbHelper.Neo4JHelper.OpenNeo4JAsyncSession();
+            var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
             
             Console.WriteLine(">> Remove all existing nodes of same label name");
             await asyncSession.ExecuteAsync($"MATCH (n1:{_nodeLabel})-[r:HAS_REL]->(n2:{_nodeLabel}) DELETE r");
@@ -70,7 +78,7 @@ namespace StopWatcher.TestCases
                     await DoTestWithInput(numberOfRelationships, numberOfCreatedRelationship);
                     Console.WriteLine($"> After {nameof(DoTestWithInput)}({numberOfRelationships})");
 
-                    numberOfCreatedRelationship += numberOfRelationships;
+                    numberOfCreatedRelationship = numberOfRelationships;
                     
                     try
                     {
@@ -86,7 +94,7 @@ namespace StopWatcher.TestCases
                     await SaveResultAsync();
                     Console.WriteLine($"> After {nameof(SaveResultAsync)}");
                 }
-                catch (Exception e)
+                catch
                 {
                     Console.WriteLine($"> (ERR) {nameof(DoTestWithInput)}({numberOfRelationships})");
                     throw;
@@ -106,18 +114,18 @@ namespace StopWatcher.TestCases
             {
                 var tasks = batch.Select(b =>
                 {
-                    Console.WriteLine($">> Batch no.{b}");
+                    Console.WriteLine($">> Batch no.{b} ({DateTime.Now:HH:mm:ss})");
                     var from = b;
                     var to = b + BatchOfCreatingRelationships - 1;
                     if (to > numberOfRelationships)
                         to = numberOfRelationships;
 
-                    var writeSession = DbHelper.Neo4JHelper.OpenNeo4JAsyncSession();
+                    var writeSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
                     var sb = new StringBuilder();
 
                     sb.Append($"MATCH (a:{_nodeLabel}), (b:{_nodeLabel}) WHERE a.n = 1 AND b.n = 2 ");
                     for (var i = from; i <= to; i++)
-                        sb.Append($"CREATE (a)-[r{i}:HAS_REL]->(b) SET r{i}.n={i} ");
+                        sb.Append($"CREATE (a)-[r{i}:HAS_REL]->(b) SET r{i}.n={i}, r{i}.i={i} ");
                     
                     return writeSession.ExecuteAsync(sb.ToString())
                         .ContinueWith(task => writeSession.CloseAsync(), TaskContinuationOptions.ExecuteSynchronously);
@@ -131,7 +139,7 @@ namespace StopWatcher.TestCases
             
             var stopWatch = new Stopwatch();
             
-            var verifySession = DbHelper.Neo4JHelper.OpenNeo4JAsyncSession();
+            var verifySession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
             stopWatch.Start();
             var result = await verifySession.ReadAsync($"MATCH (a:{_nodeLabel})-[r:HAS_REL]->(b:{_nodeLabel}) WHERE a.n=1 AND b.n=2 RETURN count(r)");
             stopWatch.Stop();
@@ -142,11 +150,11 @@ namespace StopWatcher.TestCases
             for (var turn = 1; turn <= 5; turn++)
             {
                 if (turn > 1)
-                    await Task.Delay(10_000);
+                    await Task.Delay(3_000);
                 
                 stopWatch.Reset();
                 stopWatch.Start();
-                var searchSession = DbHelper.Neo4JHelper.OpenNeo4JAsyncSession();
+                var searchSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
                 await searchSession.ReadAsync($"MATCH (a:{_nodeLabel})-[r:HAS_REL]->(b:{_nodeLabel}) WHERE a.n=1 AND b.n=2 AND r.n = {numberOfRelationships + 1} RETURN count(r)");
                 stopWatch.Stop();
 

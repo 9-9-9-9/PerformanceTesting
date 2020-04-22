@@ -9,7 +9,7 @@ namespace SharedLib
 {
     public static class DbHelper
     {
-        public static class PostgreSqlHelper
+        public static class PostgreSql
         {
             public static async Task<NpgsqlConnection> OpenConnectionAsync()
             {
@@ -19,9 +19,61 @@ namespace SharedLib
             }
         }
 
-        public static class Neo4JHelper
+        public static class Neo4J
         {
             public static IAsyncSession OpenNeo4JAsyncSession() => ConnectionManager.Neo4JDriver.AsyncSession();
+
+            public static Neo4JConnection Connection => new Neo4JConnection();
+
+            public class Neo4JConnection : IDisposable
+            {
+                private readonly IDriver _driver;
+
+                private readonly IAsyncSession _session;
+
+                public Neo4JConnection()
+                {
+                    _driver =
+                        GraphDatabase.Driver(ConnectionManager.Neo4JHost,
+                            AuthTokens.Basic(ConnectionManager.Neo4JUser, ConnectionManager.Neo4JPass)
+                        );
+                    _session = _driver.AsyncSession();
+                }
+
+                public async Task WriteAsync(string commands)
+                {
+                    var cursor = await _session.RunAsync(commands);
+                    await cursor.ConsumeAsync();
+                }
+
+                public async Task<TResult> ReadAsync<TResult>(string commands,
+                    Func<IResultCursor, TResult> dataExtractor)
+                {
+                    var cursor = await _session.RunAsync(commands);
+                    return dataExtractor(cursor);
+                }
+
+                public void Dispose()
+                {
+                    _session?.CloseAsync().Wait();
+                    _driver?.CloseAsync().Wait();
+                    _driver?.Dispose();
+                }
+            }
+        }
+    }
+
+    public static class Neo4JConnectionExtensions
+    {
+        public static async Task<T> ReadAsync<T>(this DbHelper.Neo4J.Neo4JConnection conn, string command)
+        {
+            return await await conn.ReadAsync(command, async cursor =>
+            {
+                if (await cursor.FetchAsync())
+                    return cursor.Current[0].As<T>();
+
+                throw new NoDataException();
+            });
         }
     }
 
@@ -69,7 +121,8 @@ namespace SharedLib
     {
         public static async Task ExecuteAsync(this IAsyncSession asyncSession, string command)
         {
-            await asyncSession.WriteTransactionAsync(async tx => { await tx.RunAsync(command); });
+            var cursor = await asyncSession.RunAsync(command);
+            await cursor.ConsumeAsync();
         }
 
         public static async Task<IRecord> ReadAsync(this IAsyncSession asyncSession, string command)

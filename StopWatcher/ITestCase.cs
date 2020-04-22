@@ -47,6 +47,8 @@ namespace StopWatcher
         public abstract Task PrintResultAsync();
         public abstract Task SaveResultAsync();
 
+        protected virtual Task PrepareAsync() => Task.CompletedTask;
+
         private readonly DateTime _runDate = DateTime.Now;
         protected string FileResult => $"{GetType().Name}_{_runDate:HH-mm-ss}.txt";
 

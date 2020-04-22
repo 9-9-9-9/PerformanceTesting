@@ -21,13 +21,13 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             Task.Run(async () =>
             {
-                var asyncSession = DbHelper.Neo4JHelper.OpenNeo4JAsyncSession();
+                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
                 await asyncSession.TruncateAsync(TableBenchInsert);
             }).Wait();
             
             Task.Run(async () =>
             {
-                await using var conn = await DbHelper.PostgreSqlHelper.OpenConnectionAsync();
+                await using var conn = await DbHelper.PostgreSql.OpenConnectionAsync();
                 await conn.CreateTableAsync(TableBenchInsert, "prop1", "prop2");
             }).Wait();
         }
@@ -37,7 +37,7 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             if (Db == DbNeo4J)
             {
-                var asyncSession = DbHelper.Neo4JHelper.OpenNeo4JAsyncSession();
+                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
                 for (var c = 1; c <= InsertRecords; c++)
                     await asyncSession.ExecuteAsync(
                         $"CREATE (o:{TableBenchInsert}) " +
@@ -46,7 +46,7 @@ namespace Neo4jVsPostgreSQL.BenchMarks
             }
             else
             {
-                await using var conn = await DbHelper.PostgreSqlHelper.OpenConnectionAsync();
+                await using var conn = await DbHelper.PostgreSql.OpenConnectionAsync();
                 for (var c = 1; c <= InsertRecords; c++)
                     await conn.ExecuteAsync(
                         $"INSERT INTO {TableBenchInsert.ToLower()}(prop2) VALUES ({c})"
@@ -59,7 +59,7 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             Task.Run(async () =>
             {
-                var asyncSession = DbHelper.Neo4JHelper.OpenNeo4JAsyncSession();
+                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
                 await asyncSession.TruncateAsync(TableBenchInsert);
                 try
                 {
@@ -75,7 +75,7 @@ namespace Neo4jVsPostgreSQL.BenchMarks
             
             Task.Run(async () =>
             {
-                await using var conn = await DbHelper.PostgreSqlHelper.OpenConnectionAsync();
+                await using var conn = await DbHelper.PostgreSql.OpenConnectionAsync();
                 await conn.ExecuteAsync($"DROP INDEX IF EXISTS {IndexNameOnProperty}");
                 await conn.CreateTableAsync(TableBenchInsert, "prop1", "prop2");
                 await conn.ExecuteAsync($"CREATE INDEX {IndexNameOnProperty} ON {TableBenchInsert.ToLower()}(prop2)");
@@ -87,7 +87,7 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             if (Db == DbNeo4J)
             {
-                var asyncSession = DbHelper.Neo4JHelper.OpenNeo4JAsyncSession();
+                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
                 for (var c = 1; c <= InsertRecords; c++)
                     await asyncSession.ExecuteAsync(
                         $"CREATE (o:{TableBenchInsert}) " +
@@ -96,7 +96,7 @@ namespace Neo4jVsPostgreSQL.BenchMarks
             }
             else
             {
-                await using var conn = await DbHelper.PostgreSqlHelper.OpenConnectionAsync();
+                await using var conn = await DbHelper.PostgreSql.OpenConnectionAsync();
                 for (var c = 1; c <= InsertRecords; c++)
                     await conn.ExecuteAsync(
                         $"INSERT INTO {TableBenchInsert.ToLower()}(prop2) VALUES ({c})"
