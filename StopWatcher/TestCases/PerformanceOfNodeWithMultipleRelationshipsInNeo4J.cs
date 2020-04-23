@@ -4,13 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Neo4j.Driver;
 using SharedLib;
 using SharedLib.Extensions;
 
 namespace StopWatcher.TestCases
 {
-    /*
+    // ReSharper disable once UnusedMember.Global
     public class PerformanceOfNodeWithMultipleRelationshipsInNeo4J : AbstractTestCase
     {
         private readonly ConcurrentDictionary<int, long> _result = new ConcurrentDictionary<int, long>();
@@ -56,16 +55,14 @@ namespace StopWatcher.TestCases
 
         protected override async Task PrepareAsync()
         {
-            var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
+            using var conn = DbHelper.Neo4J.Connection;
             
             Console.WriteLine(">> Remove all existing nodes of same label name");
-            await asyncSession.ExecuteAsync($"MATCH (n1:{_nodeLabel})-[r:HAS_REL]->(n2:{_nodeLabel}) DELETE r");
-            await asyncSession.ExecuteAsync($"MATCH (n:{_nodeLabel}) DELETE n");
+            await conn.WriteAsync($"MATCH (n1:{_nodeLabel})-[r:HAS_REL]->(n2:{_nodeLabel}) DELETE r");
+            await conn.WriteAsync($"MATCH (n:{_nodeLabel}) DELETE n");
             
             Console.WriteLine(">> Create 2 fresh nodes");
-            await asyncSession.ExecuteAsync($"CREATE (a:{_nodeLabel}), (b:{_nodeLabel}) SET a.n = 1, b.n = 2");
-            
-            await asyncSession.CloseAsync();
+            await conn.WriteAsync($"CREATE (a:{_nodeLabel}), (b:{_nodeLabel}) SET a.n = 1, b.n = 2");
         }
 
         protected override async Task DoWorkAsync()
@@ -121,30 +118,28 @@ namespace StopWatcher.TestCases
                     if (to > numberOfRelationships)
                         to = numberOfRelationships;
 
-                    var writeSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
                     var sb = new StringBuilder();
 
                     sb.Append($"MATCH (a:{_nodeLabel}), (b:{_nodeLabel}) WHERE a.n = 1 AND b.n = 2 ");
                     for (var i = from; i <= to; i++)
                         sb.Append($"CREATE (a)-[r{i}:HAS_REL]->(b) SET r{i}.n={i}, r{i}.i={i} ");
-                    
-                    return writeSession.ExecuteAsync(sb.ToString())
-                        .ContinueWith(task => writeSession.CloseAsync(), TaskContinuationOptions.ExecuteSynchronously);
+
+                    using var conn = DbHelper.Neo4J.Connection;
+                    return conn.WriteAsync(sb.ToString());
                 }).ToArray();
 
                 await Task.WhenAll(tasks);
-                await Task.WhenAll(tasks.Select(t => t.Result));
             }
 
             Console.WriteLine($"> Created {toBeCreated} relationships");
             
             var stopWatch = new Stopwatch();
-            
-            var verifySession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
+
+            using var verifySession = DbHelper.Neo4J.Connection;
             stopWatch.Start();
-            var result = await verifySession.ReadAsync($"MATCH (a:{_nodeLabel})-[r:HAS_REL]->(b:{_nodeLabel}) WHERE a.n=1 AND b.n=2 RETURN count(r)");
+            var cnt = await verifySession.ReadAsync<int>($"MATCH (a:{_nodeLabel})-[r:HAS_REL]->(b:{_nodeLabel}) WHERE a.n=1 AND b.n=2 RETURN count(r)");
             stopWatch.Stop();
-            Console.WriteLine($"> Verify step: {result[0].As<int>()} relationships ({stopWatch.ElapsedMilliseconds} ms)");
+            Console.WriteLine($"> Verify step: {cnt} relationships ({stopWatch.ElapsedMilliseconds} ms)");
 
             var minimum = long.MaxValue;
 
@@ -154,16 +149,14 @@ namespace StopWatcher.TestCases
                     await Task.Delay(3_000);
                 
                 stopWatch.Reset();
+                var searchSession = DbHelper.Neo4J.Connection;
                 stopWatch.Start();
-                var searchSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
-                await searchSession.ReadAsync($"MATCH (a:{_nodeLabel})-[r:HAS_REL]->(b:{_nodeLabel}) WHERE a.n=1 AND b.n=2 AND r.n = {numberOfRelationships + 1} RETURN count(r)");
+                await searchSession.ReadAsync<int>($"MATCH (a:{_nodeLabel})-[r:HAS_REL]->(b:{_nodeLabel}) WHERE a.n=1 AND b.n=2 AND r.n = {numberOfRelationships + 1} RETURN count(r)");
                 stopWatch.Stop();
 
                 minimum = Math.Min(minimum, stopWatch.ElapsedMilliseconds);
                 
                 Console.WriteLine($">> Turn {turn}: {stopWatch.ElapsedMilliseconds}/{minimum} ms");
-                
-                await searchSession.CloseAsync();
             }
 
             _result.AddOrUpdate(numberOfRelationships, 
@@ -196,5 +189,4 @@ namespace StopWatcher.TestCases
             return sb.ToString();
         }
     }
-    */
 }

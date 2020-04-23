@@ -21,8 +21,6 @@ namespace SharedLib
 
         public static class Neo4J
         {
-            public static IAsyncSession OpenNeo4JAsyncSession() => ConnectionManager.Neo4JDriver.AsyncSession();
-
             public static Neo4JConnection Connection => new Neo4JConnection();
 
             public class Neo4JConnection : IDisposable

@@ -22,8 +22,6 @@ namespace StopWatcher.TestCases
 
         protected override async Task DoWorkAsync()
         {
-            await PrepareAsync();
-
             int noOfRel, relMaxNo;
             using (var conn = DbHelper.Neo4J.Connection)
             {
@@ -144,11 +142,9 @@ namespace StopWatcher.TestCases
 
         protected override async Task PrepareAsync()
         {
-            using (var conn = DbHelper.Neo4J.Connection)
-            {
-                await conn.WriteAsync($"MERGE (node:{Label} {{n:1}})");
-                await conn.WriteAsync($"MERGE (node:{Label} {{n:2}})");
-            }
+            using var conn = DbHelper.Neo4J.Connection;
+            await conn.WriteAsync($"MERGE (node:{Label} {{n:1}})");
+            await conn.WriteAsync($"MERGE (node:{Label} {{n:2}})");
         }
 
         public override Task PrintResultAsync()

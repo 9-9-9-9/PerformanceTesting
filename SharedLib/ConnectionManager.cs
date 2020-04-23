@@ -5,7 +5,10 @@ namespace SharedLib
     public static class ConnectionManager
     {
         public static readonly IDriver Neo4JDriver =
-            GraphDatabase.Driver(Neo4JHost, AuthTokens.Basic(Neo4JUser, Neo4JPass));
+            GraphDatabase.Driver(
+                Neo4JHost,
+                AuthTokens.Basic(Neo4JUser, Neo4JPass)
+            );
 
         public const string Neo4JHost = "bolt://localhost:7687";
         public const string Neo4JUser = "neo4j";

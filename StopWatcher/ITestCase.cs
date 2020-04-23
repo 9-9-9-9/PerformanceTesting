@@ -18,6 +18,8 @@ namespace StopWatcher
         {
             try
             {
+                Console.WriteLine($"> Before {nameof(PrepareAsync)}");
+                await PrepareAsync();
                 Console.WriteLine($"> Before {nameof(DoWorkAsync)}");
                 await DoWorkAsync();
                 Console.WriteLine($"> After {nameof(DoWorkAsync)}");
