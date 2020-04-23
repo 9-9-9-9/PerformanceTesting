@@ -9,11 +9,17 @@ namespace SharedLib
 {
     public static class DbHelper
     {
+        public const string Neo4JHost = "bolt://localhost:7687";
+        public const string Neo4JUser = "neo4j";
+        public const string Neo4JPass = "neo4j";
+
+        public const string PostgresConnectionString = "Host=localhost;Username=postgres;Database=postgres";
+        
         public static class PostgreSql
         {
             public static async Task<NpgsqlConnection> OpenConnectionAsync()
             {
-                var npgSqlConnection = new NpgsqlConnection(ConnectionManager.PostgresConnectionString);
+                var npgSqlConnection = new NpgsqlConnection(PostgresConnectionString);
                 await npgSqlConnection.OpenAsync();
                 return npgSqlConnection;
             }
@@ -32,8 +38,8 @@ namespace SharedLib
                 public Neo4JConnection()
                 {
                     _driver =
-                        GraphDatabase.Driver(ConnectionManager.Neo4JHost,
-                            AuthTokens.Basic(ConnectionManager.Neo4JUser, ConnectionManager.Neo4JPass)
+                        GraphDatabase.Driver(Neo4JHost,
+                            AuthTokens.Basic(Neo4JUser, Neo4JPass)
                         );
                     _session = _driver.AsyncSession();
                 }

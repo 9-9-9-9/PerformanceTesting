@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using SharedLib;
 using StopWatcher.TestCases;
 
 namespace StopWatcher
@@ -9,7 +8,6 @@ namespace StopWatcher
         internal static async Task Main()
         {
             await RunTestAsync<QueryOfMatchMultipleRel>();
-            await ConnectionManager.Neo4JDriver.CloseAsync();
         }
 
         private static async Task RunTestAsync<TTestCase>() where TTestCase : ITestCase, new()
