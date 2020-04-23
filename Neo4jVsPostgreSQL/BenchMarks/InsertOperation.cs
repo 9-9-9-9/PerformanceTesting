@@ -4,7 +4,7 @@ using SharedLib;
 
 namespace Neo4jVsPostgreSQL.BenchMarks
 {
-    [DryJob]
+    // [DryJob]
     [RPlotExporter]
     public class InsertOperation
     {
@@ -16,13 +16,13 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         private const string IndexNameOnProperty = "myidx1";
         private const string DbNeo4J = "Neo4J";
 
-        [IterationSetup(Target = nameof(InsertWoIdx))]
+        [GlobalSetup(Target = nameof(InsertWoIdx))]
         public void SetupInsertWithoutIndex()
         {
             Task.Run(async () =>
             {
-                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
-                await asyncSession.TruncateAsync(TableBenchInsert);
+                using var conn = DbHelper.Neo4J.Connection;
+                await conn.TruncateAsync(TableBenchInsert);
             }).Wait();
             
             Task.Run(async () =>
@@ -37,11 +37,12 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             if (Db == DbNeo4J)
             {
-                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
+                using var conn = DbHelper.Neo4J.Connection;
                 for (var c = 1; c <= InsertRecords; c++)
-                    await asyncSession.ExecuteAsync(
-                        $"CREATE (o:{TableBenchInsert}) " +
-                        "SET o.prop2 = " + c
+                    await conn.WriteAsync(
+                        $@"
+CREATE (o:{TableBenchInsert})
+SET o.prop2 = {c}"
                     );
             }
             else
@@ -54,23 +55,23 @@ namespace Neo4jVsPostgreSQL.BenchMarks
             }
         }
 
-        [IterationSetup(Target = nameof(InsertWithIdx))]
+        [GlobalSetup(Target = nameof(InsertWithIdx))]
         public void SetupInsertWithIndex()
         {
             Task.Run(async () =>
             {
-                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
-                await asyncSession.TruncateAsync(TableBenchInsert);
+                using var conn = DbHelper.Neo4J.Connection;
+                await conn.TruncateAsync(TableBenchInsert);
                 try
                 {
-                    await asyncSession.ExecuteAsync($"DROP INDEX ON :{TableBenchInsert}(prop2)");
+                    await conn.WriteAsync($"DROP INDEX ON :{TableBenchInsert}(prop2)");
                 }
                 catch
                 {
                     //
                 }
 
-                await asyncSession.ExecuteAsync($"CREATE INDEX ON :{TableBenchInsert}(prop2)");
+                await conn.WriteAsync($"CREATE INDEX ON :{TableBenchInsert}(prop2)");
             }).Wait();
             
             Task.Run(async () =>
@@ -87,11 +88,12 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             if (Db == DbNeo4J)
             {
-                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
+                using var conn = DbHelper.Neo4J.Connection;
                 for (var c = 1; c <= InsertRecords; c++)
-                    await asyncSession.ExecuteAsync(
-                        $"CREATE (o:{TableBenchInsert}) " +
-                        "SET o.prop2 = " + c
+                    await conn.WriteAsync(
+                        $@"
+CREATE (o:{TableBenchInsert})
+SET o.prop2 = {c}"
                     );
             }
             else

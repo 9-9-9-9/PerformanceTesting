@@ -119,26 +119,8 @@ namespace SharedLib
 
     public static class Neo4JHelperExtensions
     {
-        public static async Task ExecuteAsync(this IAsyncSession asyncSession, string command)
-        {
-            var cursor = await asyncSession.RunAsync(command);
-            await cursor.ConsumeAsync();
-        }
-
-        public static async Task<IRecord> ReadAsync(this IAsyncSession asyncSession, string command)
-        {
-            Console.WriteLine(command);
-            return await asyncSession.ReadTransactionAsync(async tx =>
-            {
-                var result = await tx.RunAsync(command);
-                if (!await result.FetchAsync())
-                    throw new DataException("No response");
-                return result.Current;
-            });
-        }
-
-        public static Task TruncateAsync(this IAsyncSession asyncSession, string label)
-            => asyncSession.ExecuteAsync($@"
+        public static Task TruncateAsync(this DbHelper.Neo4J.Neo4JConnection connection, string label)
+            => connection.WriteAsync($@"
 MATCH (n:{label})
 DELETE n
 ");

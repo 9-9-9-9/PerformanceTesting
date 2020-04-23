@@ -10,6 +10,7 @@ using SharedLib.Extensions;
 
 namespace StopWatcher.TestCases
 {
+    /*
     public class PerformanceOfNodeWithMultipleRelationshipsInNeo4J : AbstractTestCase
     {
         private readonly ConcurrentDictionary<int, long> _result = new ConcurrentDictionary<int, long>();
@@ -195,4 +196,5 @@ namespace StopWatcher.TestCases
             return sb.ToString();
         }
     }
+    */
 }

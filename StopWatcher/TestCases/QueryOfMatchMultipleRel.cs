@@ -16,7 +16,7 @@ namespace StopWatcher.TestCases
         private const string Label = "NBigRel3";
         private const string Rel = "HAS_REL2";
 
-        private const int MaxNoOfRel = 500_000;
+        private const int MaxNoOfRel = 2_000_000;
         private const int BatchSize = 1_000;
         private const int PoolSize = 3;
 
@@ -68,7 +68,6 @@ namespace StopWatcher.TestCases
                         if (to >= MaxNoOfRel)
                             to = MaxNoOfRel - 1;
 
-                        var writeSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
                         var sb = new StringBuilder();
 
                         sb.Append($"MATCH (a:{Label}), (b:{Label}) WHERE a.n = 1 AND b.n = 2 ");
@@ -79,14 +78,15 @@ namespace StopWatcher.TestCases
                         }
 
                         Console.WriteLine(
-                            $">> Batch no.{b}/{numberOfBatches} executing cypher query at {DateTime.Now:HH:mm:ss}");
+                            $">> Batch no.{b}/{numberOfBatches} executing cypher query at {DateTime.Now:HH:mm:ss}"
+                        );
 
-                        await writeSession.ExecuteAsync(sb.ToString());
+                        using var conn = DbHelper.Neo4J.Connection;
+                        await conn.WriteAsync(sb.ToString());
 
                         Console.WriteLine(
-                            $">> Batch no.{b}/{numberOfBatches} executed query successfully at {DateTime.Now:HH:mm:ss}");
-
-                        await writeSession.CloseAsync();
+                            $">> Batch no.{b}/{numberOfBatches} executed query successfully at {DateTime.Now:HH:mm:ss}"
+                        );
 
                         Console.WriteLine($">> Batch no.{b}/{numberOfBatches} finished at {DateTime.Now:HH:mm:ss}");
                     }).ToArray();
@@ -114,7 +114,8 @@ namespace StopWatcher.TestCases
 
                 if (noOfRel < MaxNoOfRel)
                 {
-                    Console.WriteLine($"Un-expected number of rel had been found. Expected {MaxNoOfRel} but found {noOfRel}, offset is {MaxNoOfRel - noOfRel}");
+                    Console.WriteLine(
+                        $"Un-expected number of rel had been found. Expected {MaxNoOfRel} but found {noOfRel}, offset is {MaxNoOfRel - noOfRel}");
                     Environment.Exit(1);
                 }
 
@@ -136,7 +137,7 @@ namespace StopWatcher.TestCases
 
                     best = Math.Min(best, stopWatch.ElapsedMilliseconds);
                 } while (--tries > 0);
-                
+
                 Console.WriteLine($"> Best record is {best} ms for {noOfRel} relations");
             }
         }

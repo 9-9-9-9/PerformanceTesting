@@ -1,11 +1,10 @@
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using Neo4j.Driver;
 using SharedLib;
 
 namespace Neo4jVsPostgreSQL.BenchMarks
 {
-    [DryJob]
+    // [DryJob]
     [RPlotExporter]
     public class CompareOperationsBetweenDBs
     {
@@ -22,18 +21,18 @@ namespace Neo4jVsPostgreSQL.BenchMarks
             Task.Run(async () =>
             {
                 // Prepare neo4j
-                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
-                await asyncSession.TruncateAsync(TableOrder);
+                using var n4JConn = DbHelper.Neo4J.Connection;
+                await n4JConn.TruncateAsync(TableOrder);
                 try
                 {
-                    await asyncSession.ExecuteAsync($"DROP INDEX ON :{TableOrder}(orderId)");
+                    await n4JConn.WriteAsync($"DROP INDEX ON :{TableOrder}(orderId)");
                 }
                 catch
                 {
                     //
                 }
 
-                await asyncSession.ExecuteAsync($"CREATE INDEX ON :{TableOrder}(orderId)");
+                await n4JConn.WriteAsync($"CREATE INDEX ON :{TableOrder}(orderId)");
 
                 // Prepare PostgreSQL
                 // ReSharper disable once StringLiteralTypo
@@ -48,7 +47,7 @@ namespace Neo4jVsPostgreSQL.BenchMarks
                 {
                     var orderId = c;
                     var price = OperationRecords - c;
-                    await asyncSession.ExecuteAsync(
+                    await n4JConn.WriteAsync(
                         $"CREATE (o:{TableOrder}) " +
                         $"SET o.orderId = {orderId}, " +
                         $"o.price = {price}"
@@ -66,11 +65,10 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             if (Db == DbNeo4J)
             {
-                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
-                var record = await asyncSession.ReadAsync(
+                using var conn = DbHelper.Neo4J.Connection;
+                return await conn.ReadAsync<int>(
                     $"MATCH (o:{TableOrder}) RETURN COUNT(*)"
                 );
-                return record[0].As<int>();
             }
             else
             {
@@ -87,11 +85,10 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             if (Db == DbNeo4J)
             {
-                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
-                var record = await asyncSession.ReadAsync(
+                using var conn = DbHelper.Neo4J.Connection;
+                return await conn.ReadAsync<int>(
                     $"MATCH (o:{TableOrder}) RETURN SUM(o.price)"
                 );
-                return record[0].As<int>();
             }
             else
             {
@@ -108,11 +105,10 @@ namespace Neo4jVsPostgreSQL.BenchMarks
         {
             if (Db == DbNeo4J)
             {
-                var asyncSession = DbHelper.Neo4J.OpenNeo4JAsyncSession();
-                var record = await asyncSession.ReadAsync(
+                using var conn = DbHelper.Neo4J.Connection;
+                return await conn.ReadAsync<int>(
                     $"MATCH (o:{TableOrder}) RETURN o.price ORDER BY o.price"
                 );
-                return record[0].As<int>();
             }
             else
             {
